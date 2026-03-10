@@ -1,4 +1,4 @@
-name: CI-CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-
   build:
+
     runs-on: ubuntu-latest
 
     steps:
@@ -16,21 +16,3 @@ jobs:
 
       - name: Build Docker Image
         run: docker build -t skynet-ops ./service
-
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: 44.220.43.135
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            docker stop skynet-container || true
-            docker rm skynet-container || true
-            docker build -t skynet-ops ~/skynet-ops-audit-service/service
-            docker run -d -p 3000:3000 --name skynet-container skynet-ops
